@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title></title>	
+		<script src="../jsreg/JSReg.js" type="text/javascript"></script>
+		<script src="../CSSReg/CSSReg.js" type="text/javascript"></script>
+		<script src="../HTMLReg/HTMLReg.js" type="text/javascript"></script>
+		<script src="DomAPI.js" type="text/javascript"></script>		
+		<style type="text/css">
+			body {
+				font: 62.5%/1.3em "Lucida Grande", verdana, arial, helvetica, sans-serif;	
+			}	
+			#html, #js, #rawOutput,#errorLog {
+				width:340px;
+				height:200px;
+				
+			}
+			.row {
+				display:block;
+				width:700px;
+			}
+			.col {
+				width:350px;
+				float:left;
+			}
+			#htmlOutput {
+				overflow:hidden;
+				background-color:#FFF;
+				position:absolute;
+				top:20px;
+				left:400px;
+				width:500px;
+				height:500px;				
+			}
+		</style>
+		<style type="text/css"></style>
+		<script type="text/javascript">
+			function errorHandler(e, parser) {
+			if (e.description) {
+					var msg = '';
+					if (e.description) {
+						msg += 'Description:' + e.description + '\n';
+					}
+					if(e.msg) {
+						msg += 'Msg:'+e.msg+'\n';
+					}
+					if (e.line) {
+						msg += 'Line:' + e.line+'\n';
+					}										
+										
+					if (parser.debugObjects.parseTree) {
+						parser.debugObjects.parseTree(e.parseTree);
+					}					
+					if (parser.debugObjects.errorLog) {
+						parser.debugObjects.errorLog(msg);
+					} else {												
+						alert(msg);
+					}
+				} else {
+					if (parser.debugObjects && parser.debugObjects.errorLog) {
+						parser.debugObjects.errorLog(e);
+					} else {						
+						alert(e);
+					}
+				}			
+		}	
+			
+			function run() {							
+				var app = 'myApp';				
+				DomAPI.setAppID(app);
+				CSSReg.setAppID(app);
+				HTMLReg.setAppID(app);				
+				var html = HTMLReg.parse(document.getElementById('html').value);										
+				document.getElementById('htmlOutput').innerHTML = html;									
+				DomAPI.setDocument(document.getElementById('htmlOutput'));											
+				var parser = DomAPI.createParser();										  
+				parser.eval(document.getElementById('js').value);
+			}
+			function clearData() {
+				document.getElementById('htmlOutput').innerHTML='';							
+				document.getElementById('html').value='';				
+			}		
+		</script>
+	</head>
+	<body>		
+		<fieldset>
+			<div class="row">					
+			JS:<br>
+				<textarea id="js">document.getElementById('x').onclick=function() {alert(this.title);}</textarea>											
+			</div>			
+			<div class="row">
+					<label>Error log:</label><br />
+					<textarea id="errorLog"></textarea>						
+				</div>
+			<div class="row">							
+				HTML:<br>
+				<textarea id="html"><a id="x" href=# title="hello">test</a></textarea>
+				<br />																					
+				<input type="button" value="Clear" onclick="clearData();" /> <input type="button" value="Run" onclick="run();" />
+				<div id="htmlOutput"></div>
+				<div id="styleObjs"></div>
+			</div>			
+		</fieldset>
+	</body>
+</html>
