@@ -8,13 +8,13 @@ window.DomAPI = function() {
 	allowedEvents = /^[$]on(?:click)[$]$/,
 	urls = /^(?:src|background|href|action|background)$/i,
 	urlsCheck = /^(?:https?:\/\/.+|\/.+|\w[^:]+|#[\w=?]*)$/,	
-	setterFunc = function(obj, propName){ return function(val) {		
-			if(val) {													
+	setterFunc = function(obj, propName){ return function(val, x) {		
+			if(val) {				
 				if(allowedEvents.test('$'+propName+'$')) {						
-					if(typeof val == 'function') { 
-						obj[propName] = function() {
-							var parser = DomAPI.createParser();							
-							parser.eval('('+val+').apply(this,[])',obj,true);
+					if(typeof val == 'function') {						
+						obj[propName] = function() {																					
+							var parser = DomAPI.createParser();								
+							parser.eval('('+(val)+').apply(this,[])',obj,true);							
 						}
 					}
 					return true;
@@ -30,16 +30,18 @@ window.DomAPI = function() {
 					} else {
 						val = '#';
 					}
-				}				
-				var html = HTMLReg.parse(val);					
+					var html = val;
+				} else {					
+					var html = HTMLReg.parse(val);
+				}
 				obj[propName] = html;
 			} else {
-				if(window.event) {					
-					var propName = event.propertyName.replace(/^[$]|[$]$/g,'');
+				if(window.event) {						
+					propName = event.propertyName.replace(/^[$]|[$]$/g,'');
 					if(allowedEvents.test(event.propertyName)) {
 						if(typeof event.srcElement[event.propertyName] == 'function') {
 							obj[event.propertyName.replace(/^[$]|[$]$/g,'')] = function() {
-								var parser = DomAPI.createParser();								
+								var parser = DomAPI.createParser();										
 								parser.eval('('+(event.srcElement['$'+propName+'$']+'')+').apply(this,[])',obj,true);						
 							}
 						}
@@ -78,12 +80,7 @@ window.DomAPI = function() {
 				},					
 				errorHandler: function(e) {
 					errorHandler(e, parser);
-				},
-				onComplete:function() {							
-					document.body.removeChild(parser.environment);																											
-					parser.environment = null;
-					parser = null;																		
-				}				
+				}								
 			   });
 			parser.setDocument({
 									$getElementById$:DomAPI.getElementById,
@@ -199,7 +196,7 @@ window.DomAPI = function() {
 				}
 				node['$'+'style'+'$'] = styles; 				
 				
-				if(!Object.defineProperty && !Object.__defineSetter__) {
+				if(!Object.defineProperty && !Object.__defineSetter__) {					
 					node.onpropertychange = setterFunc(node, attr);
 				}
 				
