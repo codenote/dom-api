@@ -1,0 +1,1 @@
+Creates a sandboxed DOM API that uses JSReg, CSSReg and HTMLReg
